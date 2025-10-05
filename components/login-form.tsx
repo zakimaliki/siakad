@@ -16,15 +16,47 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [role, setRole] = useState("siswa")
   const [loading, setLoading] = useState(false)
+  const [username, setUsername] = useState("ahmad.fauzi")
+  const [password, setPassword] = useState("password123")
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
+    // Store role in localStorage for sidebar to use
+    localStorage.setItem("userRole", role)
+
     // Simulate login
     setTimeout(() => {
       router.push("/dashboard")
     }, 1000)
+  }
+
+  const handleRoleChange = (newRole: string) => {
+    setRole(newRole)
+
+    // Pre-fill credentials based on role
+    switch (newRole) {
+      case "siswa":
+        setUsername("ahmad.fauzi")
+        setPassword("password123")
+        break
+      case "guru":
+        setUsername("ustadz.karim")
+        setPassword("guru123")
+        break
+      case "admin":
+        setUsername("admin")
+        setPassword("admin123")
+        break
+      case "wali":
+        setUsername("ahmad.rozak")
+        setPassword("wali123")
+        break
+      default:
+        setUsername("")
+        setPassword("")
+    }
   }
 
   return (
@@ -55,7 +87,7 @@ export function LoginForm() {
                   type="button"
                   variant={role === r ? "default" : "outline"}
                   className={role === r ? "bg-primary hover:bg-primary-hover" : ""}
-                  onClick={() => setRole(r)}
+                  onClick={() => handleRoleChange(r)}
                 >
                   {r.charAt(0).toUpperCase() + r.slice(1)}
                 </Button>
@@ -68,7 +100,13 @@ export function LoginForm() {
             <Label htmlFor="username">Username / Email / NIS</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input id="username" placeholder="ahmad.zaki atau 2021456" className="pl-10" defaultValue="ahmad.fauzi" />
+              <Input
+                id="username"
+                placeholder="ahmad.zaki atau 2021456"
+                className="pl-10"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
             </div>
           </div>
 
@@ -82,7 +120,8 @@ export function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 className="pl-10 pr-10"
-                defaultValue="password123"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <button
                 type="button"

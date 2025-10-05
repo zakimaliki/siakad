@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -15,12 +15,17 @@ import {
   MSquare as Mosque,
   ChevronLeft,
   ChevronRight,
-  X as CloseIcon,
+  CloverIcon as CloseIcon,
+  Users,
+  MessageSquare,
+  BookOpen,
+  FileText,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
-const menuItems = [
+const siswaMenuItems = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
@@ -80,12 +85,151 @@ const menuItems = [
     icon: User,
     href: "/profil",
   },
+  {
+    title: "Logout",
+    icon: LogOut,
+    href: "/logout",
+  },
+]
+
+const waliMenuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+  },
+  {
+    title: "Data Anak",
+    icon: Users,
+    items: [
+      { title: "Profil Anak", href: "/data-siswa" },
+      { title: "Nilai Semester", href: "/nilai" },
+      { title: "Absensi", href: "/absensi" },
+    ],
+  },
+  {
+    title: "Akademik",
+    icon: GraduationCap,
+    items: [
+      { title: "Jadwal Pelajaran", href: "/jadwal" },
+      { title: "Kalender Akademik", href: "/kalender" },
+      { title: "Perpustakaan", href: "/perpustakaan" },
+    ],
+  },
+  {
+    title: "Perkembangan",
+    icon: ClipboardCheck,
+    items: [
+      { title: "Catatan BK", href: "/catatan-bk" },
+      { title: "Skor Pelanggaran & Prestasi", href: "/pelanggaran-prestasi" },
+      { title: "Konseling", href: "/konseling" },
+    ],
+  },
+  {
+    title: "Keuangan",
+    icon: DollarSign,
+    items: [
+      { title: "Pembayaran SPP", href: "/spp" },
+      { title: "Tabungan Anak", href: "/tabungan" },
+    ],
+  },
+  {
+    title: "Komunikasi",
+    icon: MessageSquare,
+    items: [
+      { title: "Berita Madrasah", href: "/berita" },
+      { title: "Notifikasi", href: "/notifikasi" },
+    ],
+  },
+  {
+    title: "Informasi",
+    icon: Building2,
+    items: [
+      { title: "Profil Madrasah", href: "/profil-madrasah" },
+      { title: "Visi & Misi", href: "/visi-misi" },
+    ],
+  },
+  {
+    title: "Profil Saya",
+    icon: User,
+    href: "/profil",
+  },
+  {
+    title: "Logout",
+    icon: LogOut,
+    href: "/logout",
+  },
+]
+
+const guruMenuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+  },
+  {
+    title: "Pengajaran",
+    icon: BookOpen,
+    items: [
+      { title: "Jadwal Mengajar", href: "/jadwal" },
+      { title: "Daftar Kelas", href: "/daftar-kelas" },
+      { title: "Input Nilai", href: "/input-nilai" },
+      { title: "Absensi Siswa", href: "/absensi-siswa" },
+    ],
+  },
+  {
+    title: "Akademik",
+    icon: GraduationCap,
+    items: [
+      { title: "Kalender Akademik", href: "/kalender" },
+      { title: "Perpustakaan", href: "/perpustakaan" },
+    ],
+  },
+  {
+    title: "Administrasi",
+    icon: FileText,
+    items: [
+      { title: "Berita & Pengumuman", href: "/berita" },
+      { title: "Opini & Rubrik", href: "/opini" },
+    ],
+  },
+  {
+    title: "Informasi",
+    icon: Building2,
+    items: [
+      { title: "Profil Madrasah", href: "/profil-madrasah" },
+      { title: "Visi & Misi", href: "/visi-misi" },
+    ],
+  },
+  {
+    title: "Notifikasi",
+    icon: Bell,
+    href: "/notifikasi",
+  },
+  {
+    title: "Profil Saya",
+    icon: User,
+    href: "/profil",
+  },
+  {
+    title: "Logout",
+    icon: LogOut,
+    href: "/logout",
+  },
 ]
 
 export function AppSidebar({ onClose }: { onClose?: () => void } = {}) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>(["Akademik"])
+  const [userRole, setUserRole] = useState<string>("siswa")
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole") || "siswa"
+    setUserRole(role)
+  }, [])
+
+  const menuItems = userRole === "wali" ? waliMenuItems : userRole === "guru" ? guruMenuItems : siswaMenuItems
 
   const toggleExpand = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]))
@@ -107,7 +251,9 @@ export function AppSidebar({ onClose }: { onClose?: () => void } = {}) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">SIAKAD</span>
-              <span className="text-xs text-muted-foreground">Madrasah</span>
+              <span className="text-xs text-muted-foreground">
+                {userRole === "wali" ? "Portal Wali" : userRole === "guru" ? "Portal Guru" : "Madrasah"}
+              </span>
             </div>
           </div>
         )}
@@ -118,7 +264,12 @@ export function AppSidebar({ onClose }: { onClose?: () => void } = {}) {
               <CloseIcon className="h-5 w-5" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="h-8 w-8 hidden md:inline-flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className="h-8 w-8 hidden md:inline-flex"
+          >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>

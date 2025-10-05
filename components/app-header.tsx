@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, Search, User, LogOut, Settings, Menu as MenuIcon } from "lucide-react"
+import { Bell, Search, User, LogOut, Settings, MenuIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -13,8 +13,61 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react"
+
+const getUserData = (role: string) => {
+  switch (role) {
+    case "siswa":
+      return {
+        name: "Ahmad Fauzi",
+        subtitle: "XI IPA 2",
+        id: "NIS: 2021456",
+        avatar: "/muslim-student.jpg",
+        initials: "AF",
+      }
+    case "guru":
+      return {
+        name: "Ustadz Abdul Karim",
+        subtitle: "Guru Fiqih",
+        id: "NIP: 198505152010011003",
+        avatar: "/indonesian-teacher.jpg",
+        initials: "AK",
+      }
+    case "admin":
+      return {
+        name: "Administrator",
+        subtitle: "Admin Sistem",
+        id: "ID: ADM001",
+        avatar: "/admin-avatar.jpg",
+        initials: "AD",
+      }
+    case "wali":
+      return {
+        name: "Ahmad Rozak",
+        subtitle: "Wali Murid",
+        id: "ID: WALI001",
+        avatar: "/indonesian-man-formal.jpg",
+        initials: "AR",
+      }
+    default:
+      return {
+        name: "Ahmad Fauzi",
+        subtitle: "XI IPA 2",
+        id: "NIS: 2021456",
+        avatar: "/muslim-student.jpg",
+        initials: "AF",
+      }
+  }
+}
 
 export function AppHeader({ onMenuClick }: { onMenuClick?: () => void } = {}) {
+  const [userData, setUserData] = useState(getUserData("siswa"))
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole") || "siswa"
+    setUserData(getUserData(role))
+  }, [])
+
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="flex h-full items-center justify-between px-4 md:px-6">
@@ -69,20 +122,20 @@ export function AppHeader({ onMenuClick }: { onMenuClick?: () => void } = {}) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/muslim-student.jpg" />
-                  <AvatarFallback className="bg-primary text-white">AF</AvatarFallback>
+                  <AvatarImage src={userData.avatar || "/placeholder.svg"} />
+                  <AvatarFallback className="bg-primary text-white">{userData.initials}</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">Ahmad Fauzi</p>
-                  <p className="text-xs text-muted-foreground">XI IPA 2</p>
+                  <p className="text-sm font-medium">{userData.name}</p>
+                  <p className="text-xs text-muted-foreground">{userData.subtitle}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div>
-                  <p className="font-medium">Ahmad Fauzi</p>
-                  <p className="text-xs text-muted-foreground">NIS: 2021456</p>
+                  <p className="font-medium">{userData.name}</p>
+                  <p className="text-xs text-muted-foreground">{userData.id}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
